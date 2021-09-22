@@ -58,7 +58,7 @@ namespace neurontest2
         {
             bool exitflag = false;
             int x1, x2;
-            Console.WriteLine("Инициализация проыесса обучения... \n" +
+            Console.WriteLine("Инициализация процесса обучения... \n" +
                 "Введите целевой результат обучения: ");
             int goalresult = Convert.ToInt32(Console.ReadLine()); //целевой результат
             Console.WriteLine("Введите обучающий параметр 1: ");
