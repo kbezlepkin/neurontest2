@@ -5,12 +5,17 @@ namespace neurontest2
     class Program
     {
         public class Neuron //класс нейрона
-        { 
+        {
+            public float[,] weight = new float[2, 2];
             public float weight11 = 0.5f, weight2 = 0.5f,//вес на входах нейрона
                             weight3 =  0.5f, weight4 = 0.5f;
 
             public void Activefunction(int input1, int input2, out float resultexit1, out float resultexit2) //функция активации нейрона
             {
+                /*  объявление при массиве весов
+                resultexit1 = (weight[1,1] * input1) / (weight[1,2] * input2);
+                resultexit2 = (weight[2,1] * input1) / (weight[2,2] * input2);*/
+
                 /*пример функции активации нейрона: перевод скорости мотоцикла в м/с*/
                 resultexit1 = (weight11 * input1) / (input2 * weight2);
                 resultexit2 = (weight3 * input1) / (weight4 * input2);
@@ -51,7 +56,7 @@ namespace neurontest2
                 return ef;
             }
 
-            public void Proverkavesov(float oshibka, float cr, float weighti1, float weighti2, out float w1, out float w2) //функция проверки весов для нейронов
+            public void Proverkavesov(float oshibka, float cr, /*float[,] weight,*/ float weighti1, float weighti2, out float w1, out float w2) //функция проверки весов для нейронов
             {
                 if (oshibka > 0)
                 { 
@@ -66,23 +71,25 @@ namespace neurontest2
             }
 
         }
-        public static void Main()
+        public static void Main() //тело программы - точка входа
         {
             bool exitflag = false;
             int x1, x2;
-            Console.WriteLine("Инициализация процесса обучения... \n" +
-                "Введите целевой результат обучения 1: ");
-            float goalresult1 = Convert.ToInt32(Console.ReadLine()); //целевой результат1
-            Console.WriteLine("Введите целевой результат обучения 2: ");
-            float goalresult2 = Convert.ToInt32(Console.ReadLine()); //целевой результат2
-            Console.WriteLine("Введите обучающий параметр 1 (расстояние): ");
-            x1 = Convert.ToInt32(Console.ReadLine()); //переменная 1
-            Console.WriteLine("Введите обучающий параметр 2(время): ");
-            x2 = Convert.ToInt32(Console.ReadLine());//переменная 2
+            //Инициализация процесса обучения нейронки
+                Console.WriteLine("Инициализация процесса обучения... \n" + "Введите целевой ответ 1: ");
+                float goalresult1 = Convert.ToInt32(Console.ReadLine()); //целевой результат1
+                Console.WriteLine("Введите целевой ответ 2: ");
+                float goalresult2 = Convert.ToInt32(Console.ReadLine()); //целевой результат2
+                Console.WriteLine("Введите обучающий параметр 1 (расстояние): ");
+                x1 = Convert.ToInt32(Console.ReadLine()); //переменная 1
+                Console.WriteLine("Введите обучающий параметр 2(время): ");
+                x2 = Convert.ToInt32(Console.ReadLine());//переменная 2
 
-            Neuron neuron = new Neuron(); //инициализация нейрона
-            neuron.Cikleobucheniya(x1,x2,goalresult1, goalresult2, exitflag); //процесс обучения
+                Neuron neuron = new Neuron(); //инициализация нейроной сетки
+                neuron.Cikleobucheniya(x1, x2, goalresult1, goalresult2, exitflag); //процесс обучения
 
+            //если обучение прошло успешно
+            //работа нейронки
             if (exitflag == false)
             {
                 useneuron://повторное использование нейронки
@@ -92,7 +99,6 @@ namespace neurontest2
                 x2 = Convert.ToInt32(Console.ReadLine());
                 neuron.Activefunction(x1, x2, out var r1, out var r2); //вызов нейронки
                 Console.WriteLine("Результаты: " + r1 +" и "+ r2);//вывод ответа
-                Console.Read();
                 checkmetka: //метка повтора ввода при ошибке
                 Console.WriteLine("Повторить?  y/n");
                 string check = Console.ReadLine();
