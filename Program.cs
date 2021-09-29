@@ -9,11 +9,7 @@ namespace neurontest2
             public float[,] weight = new float[2/*максимальное количество нейронов*/, 2/* максимальное количество входов на нейроне*/];
 
             public float Activefunction(int input1, int input2, int i) //функция активации нейрона
-            {
-                float resultexit = (weight[i, 0] * input1) / (weight[i, 1] * input2);
-                return resultexit;
-            }
-
+            { float resultexit = (weight[i, 0] * input1) / (weight[i, 1] * input2); return resultexit; }
 
             public bool Cikleobucheniya(int input1, int input2, float gr1, float gr2, bool ef) //функция обучения нейронки
             {
@@ -48,7 +44,7 @@ namespace neurontest2
                 Console.Read(); ef = true; return ef;
             }
 
-            public void Proverkavesov(float oshibka, float cr, int i /*float[,] weight,*/) //функция проверки весов для нейронов
+            public void Proverkavesov(float oshibka, float cr, int i) //функция проверки весов для нейронов
             {
                 if (oshibka > 0)
                 { weight[i, 0] = weight[i, 0] + oshibka / cr; }
@@ -70,7 +66,6 @@ namespace neurontest2
             x1 = Convert.ToInt32(Console.ReadLine()); //переменная 1
             Console.WriteLine("Введите обучающий параметр 2(время): ");
             x2 = Convert.ToInt32(Console.ReadLine());//переменная 2
-
             //инициализация нейроной сетки
             Neuron neuron = new Neuron(); //инициализация экземпляра нейроной сетки
             for (int i = 0; i < 2; i++) //инициализация весов экземпляра нейроной сетки
@@ -78,12 +73,10 @@ namespace neurontest2
                 for (int j = 0; j < 2; j++)
                 { neuron.weight[i, j] = 0.5f; }
             }
-
             neuron.Cikleobucheniya(x1, x2, goalresult1, goalresult2, exitflag); //процесс обучения
 
-            //если обучение прошло успешно
             //работа нейронки
-            if (exitflag == false)
+            if (exitflag == false) //если обучение прошло успешно
             {
                 useneuron://повторное использование нейронки
                 Console.WriteLine("Введите параметр 1: ");
