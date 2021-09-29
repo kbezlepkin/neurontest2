@@ -10,7 +10,7 @@ namespace neurontest2
 
             public float Activefunction(int input1, int input2, int i) //функция активации нейрона
             {
-                float resultexit = (weight[i, 1] * input1) / (weight[i, 2] * input2);
+                float resultexit = (weight[i, 0] * input1) / (weight[i, 1] * input2);
                 return resultexit;
             }
 
@@ -32,7 +32,7 @@ namespace neurontest2
 
                     //вывод текущего состояния обучения
                     /*if (iteraciya % 200 == 0) */
-                    Console.WriteLine("Количество итераций: " + iteraciya + ". Текущая погрешности: " + delta[1] + " и " + delta[2]);
+                    Console.WriteLine("Количество итераций: " + iteraciya + ". Текущая погрешности: " + delta[0] + " и " + delta[1]);
                     
                     //если обучение завершено
                     bool suc = true;
@@ -51,9 +51,9 @@ namespace neurontest2
             public void Proverkavesov(float oshibka, float cr, int i /*float[,] weight,*/) //функция проверки весов для нейронов
             {
                 if (oshibka > 0)
-                { weight[i, 1] = weight[i, 1] + oshibka / cr; }
+                { weight[i, 0] = weight[i, 0] + oshibka / cr; }
                 else
-                { weight[i, 2] = weight[i, 2] + oshibka / cr; }
+                { weight[i, 1] = weight[i, 1] + oshibka / cr; }
             }
 
         }
@@ -90,7 +90,7 @@ namespace neurontest2
                 x1 = Convert.ToInt32(Console.ReadLine());
                 Console.WriteLine("Введите параметр 2: ");
                 x2 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Результаты: " + neuron.Activefunction(x1, x2, 1) +" и "+ neuron.Activefunction(x1, x2, 2));//вывод ответа
+                Console.WriteLine("Результаты: " + neuron.Activefunction(x1, x2, 0) +" и "+ neuron.Activefunction(x1, x2, 1));//вывод ответа
                 checkmetka: //метка повтора ввода при ошибке
                 Console.WriteLine("Повторить?  y/n");
                 string check = Console.ReadLine();
