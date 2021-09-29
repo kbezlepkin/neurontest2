@@ -10,37 +10,35 @@ namespace neurontest2
             public float weight11 = 0.5f, weight2 = 0.5f,//вес на входах нейрона
                             weight3 =  0.5f, weight4 = 0.5f;
 
-            public void Activefunction(int input1, int input2, out float resultexit1, out float resultexit2) //функция активации нейрона
+            public float Activefunction(int input1, int input2, int i) //функция активации нейрона
             {
-                /*  объявление при массиве весов
-                resultexit1 = (weight[1,1] * input1) / (weight[1,2] * input2);
-                resultexit2 = (weight[2,1] * input1) / (weight[2,2] * input2);*/
-
-                /*пример функции активации нейрона: перевод скорости мотоцикла в м/с*/
-                resultexit1 = (weight11 * input1) / (input2 * weight2);
-                resultexit2 = (weight3 * input1) / (weight4 * input2);
+                float resultexit = (weight[i, 1] * input1) / (weight[i, 2] * input2);
+                return resultexit;
             }
 
 
             public bool Cikleobucheniya(int input1, int input2, float gr1, float gr2, bool ef) //функция обучения нейронки
             {
                 float delta1, delta2; //погрешность ответа на выходе
-
+                float[] delta = new float[2];
+                float[] gr = { gr1, gr2 };
                 for (int iteraciya = 0; iteraciya < 10000 /*количество итераций*/; iteraciya++) //метод дял ограниченного количества итераций
                 {
-                    Activefunction(input1, input2, out float curresult1, out float curresult2);//где curresult1, curresult2 текущий результат
-                    delta1 = gr1 - curresult1; //погрешность измерений
-                    delta2 = gr2 - curresult2;
-                    //условие изменения весов
-                    if (delta1 > 0.005f || delta1 < -0.005f) 
+                    for (int i = 0; i < 2; i++)
                     {
-                        Proverkavesov(delta1, curresult1, weight11, weight2, out  weight11, out weight2);
+                        delta[i] = gr[i] - Activefunction(input1, input2, i);
+                        //условие изменения весов
+                        if (delta[i] > 0.005f || delta[i] < -0.005f)
+                        {
+                            Proverkavesov(delta[i], Activefunction(input1, input2, i), i);
+                        }
                     }
-                    if (delta2 > 0.005f || delta2 < -0.005f)
-                    {
-                        Proverkavesov(delta2, curresult2, weight3, weight4, out weight3, out weight4);
-                    }
+
                     //если обучение завершено
+                    foreach (float d in delta)
+                    { 
+                        if
+                    }
                     if (delta1 < 0.005f && delta1 > -0.005f && delta2 < 0.005f && delta2 > -0.005f)
                     {
                         Console.WriteLine("Обучение завершено");
@@ -48,7 +46,7 @@ namespace neurontest2
                     }
                     //вывод текущего состояния обучения
                     /*if (iteraciya % 200 == 0) */
-                    Console.WriteLine("Количество итераций: " + iteraciya + ". Текущая погрешности: " + delta1 + " и " + delta2);
+                    Console.WriteLine("Количество итераций: " + iteraciya + ". Текущая погрешности: " + delta[1] + " и " + delta[2]);
                 }
                 Console.WriteLine("Закончилось количество попыток, обучений не завершено"); //если неуспел обучиться
                 Console.Read();
