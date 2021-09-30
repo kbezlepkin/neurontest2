@@ -6,59 +6,46 @@ namespace neurontest2
     {
         public class NeuronNet //класс нейрона
         {
-            public float[,,] weight = new float[2/*количество слоев*/,2/*максимальное количество нейронов*/, 2/* максимальное количество входов на нейроне*/];
+            //массив весов всех нейронов, где
+            public static int cs = 2;//количество слоев
+            public static int cn = 2;//максимальное количество нейронов
+            public static int cen = 2;//максимальное количество входов на нейроне
+            public float[,,] weight = new float[cs, cn, cen];
+            float[,] exitmass = new float[cs, cn];
 
-            public float Activefunction(int input1, int input2, int sloyneyronki, int nomerneyrona) //функция активации нейрона
+            public float Activefunction1sloy(float input1, float input2, int sloyneyronki, int nomerneyrona) //функция активации нейрона 1го слоя
             {
-                if (sloyneyronki > 0)
-                {
-                    float resultexit = (weight[sloyneyronki, nomerneyrona, 0] * Activefunction(input1, input2, sloyneyronki-1, nomerneyrona)) / (weight[sloyneyronki, nomerneyrona, 1] * Activefunction(input1, input2, sloyneyronki - 1, nomerneyrona));
-                    return resultexit;
-                }
-                else
-                {
-                    float resultexit = (weight[sloyneyronki, nomerneyrona, 0] * input1) / (weight[sloyneyronki, nomerneyrona, 1] * input2);
-                    return resultexit;
-                }
+                exitmass[sloyneyronki, nomerneyrona] = (weight[sloyneyronki, nomerneyrona, 0] * input1) / (weight[sloyneyronki, nomerneyrona, 1] * input2);
+                return exitmass[sloyneyronki, nomerneyrona];
             }
 
-            public bool Cikleobucheniya(int input1, int input2, float gr1, float gr2, bool ef) //функция обучения нейронки
+            public float Activefunction2sloy(float input1, float input2, int sloyneyronki, int nomerneyrona) //функция активации нейрона 2го слоя
+            {
+                exitmass[sloyneyronki, nomerneyrona] = (weight[sloyneyronki, nomerneyrona, 0] * input1) + (weight[sloyneyronki, nomerneyrona, 1] * input2);
+                return exitmass[sloyneyronki, nomerneyrona];
+            }
+
+            public void FunctionObucheniya(float input1, float input2, float gr1, float[,] d) //функция обучения нейронки
             {
                 //погрешность ответа на выходе
-                float[,] delta = new float[2,2];
-                float[] gr = { gr1, gr2 };
-                for (int iteraciya = 0; iteraciya < 10000 /*количество итераций*/; iteraciya++) //метод дял ограниченного количества итераций
-                {
-                    Console.WriteLine("Количество итераций: " + iteraciya +'.');
-                    Console.WriteLine("Текущии погрешности: ");
-                    for (int sloy = 0; sloy < 2; sloy++)
-                    {
-                        for (int j = 0; j < 2; j++)
-                        {
-                            delta[sloy, j] = gr[j] - Activefunction(input1, input2,sloy, j);
-                            //условие изменения весов
-                            if (delta[sloy, j] > 0.005f || delta[sloy, j] < -0.005f)
-                            { Proverkavesov(delta[sloy, j], Activefunction(input1, input2,sloy, j),sloy, j); }
-                        }
-
-                        //вывод текущего состояния обучения
-                        /*if (iteraciya % 200 == 0) */
-                        for (int j = 0; j < 2; j++)
-                        { Console.WriteLine(delta[sloy, j]); }
-
-                        //если обучение завершено
-                        bool suc = true;
-                        foreach (float d in delta)
-                        {
-                            if (d > 0.005f || d < -0.005f)
-                            { suc = false; }
-                        }
-                        if (suc == true)
-                        { Console.WriteLine("Обучение завершено"); return ef; }
-                    }
+                for (int i = 0; i < cn; i++)
+                { 
+                    float currentiterresult = Activefunction2sloy(Activefunction1sloy(), Activefunction1sloy(), NeuronNet.cs, i);
+                    float[] currentdelta = new float[cn];
+                    currentdelta[i] = gr1 - currentiterresult; 
                 }
-                Console.WriteLine("Закончилось количество попыток, обучений не завершено"); //если неуспел обучиться
-                Console.Read(); ef = true; return ef;
+
+
+
+                float[] gr = { gr1 };
+
+                for (int j = 0; j < NeuronNet.cn; j++)
+                {
+                    d[sloy, j] = gr[j] - Activefunction2sloy(input1, input2, sloy, j);
+                    //условие изменения весов
+                    if (d[sloy, j] > 0.005f || d[sloy, j] < -0.005f)
+                    { Proverkavesov(delta[sloy, j], Activefunction2sloy(input1, input2, sloy, j), sloy, j); }
+                }
             }
 
             public void Proverkavesov(float oshibka, float cr, int i, int j) //функция проверки весов для нейронов
@@ -68,8 +55,33 @@ namespace neurontest2
                 else
                 { weight[i, j, 1] = weight[i, j, 1] + oshibka / cr; }
             }
-
         }
+
+        public static bool ProcessObucheniya(int input1, int input2, float gr1, bool ef, NeuronNet n)
+        {
+            for (int iteraciya = 0; iteraciya < 10000 /*количество итераций*/; iteraciya++) //метод дял ограниченного количества итераций
+            {
+                Console.WriteLine("Количество пройденых итераций: " + iteraciya + '.');
+                //массив отклонений на текущей итерации
+                float[,] delta = new float[NeuronNet.cs, NeuronNet.cn];
+                n.FunctionObucheniya(input1, input2, gr1, delta);
+                Console.WriteLine("Текущии погрешности: ");
+                //тут реализация проверки
+
+                //если обучение завершено
+                bool suc = true;
+                for (int i = 0; i<NeuronNet.cn; i++)
+                {
+                    if (delta[NeuronNet.cs,i] > 0.005f || delta[NeuronNet.cs, i] < -0.005f)
+                    { suc = false; }
+                }
+                if (suc == true)
+                { Console.WriteLine("Обучение завершено"); return ef; }
+            }
+            Console.WriteLine("Закончилось количество попыток, обучений не завершено"); //если неуспел обучиться
+            Console.Read(); ef = true; return ef;
+        }
+
         public static void Main() //тело программы - точка входа
         {
             bool exitflag = false;
@@ -93,7 +105,8 @@ namespace neurontest2
                     { neuron.weight[i, j, k] = 0.5f; }
                 }
             }
-            neuron.Cikleobucheniya(x1, x2, goalresult1, goalresult2, exitflag); //процесс обучения
+            
+            ProcessObucheniya(x1, x2, goalresult1, goalresult2, exitflag, neuron); //процесс обучения
 
             //работа нейронки
             if (exitflag == false) //если обучение прошло успешно
@@ -103,7 +116,7 @@ namespace neurontest2
                 x1 = Convert.ToInt32(Console.ReadLine());
                 Console.WriteLine("Введите параметр 2: ");
                 x2 = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Результаты: " + neuron.Activefunction(x1, x2, 1, 0) +" и "+ neuron.Activefunction(x1, x2, 1,1));//вывод ответа
+                Console.WriteLine("Результаты: " + neuron.Activefunction1sloy(x1, x2, 1, 0) +" и "+ neuron.Activefunction1sloy(x1, x2, 1,1));//вывод ответа
                 checkmetka: //метка повтора ввода при ошибке
                 Console.WriteLine("Повторить?  y/n");
                 string check = Console.ReadLine();
